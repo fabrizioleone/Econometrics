@@ -14,13 +14,12 @@ Packages <- c("nloptr", "evd", "tictoc", "parallel", "plotrix")
 invisible(lapply(Packages, library, character.only = TRUE))
 #invisible(lapply(Packages, install.packages, character.only = TRUE)) # if some package is missing
 
-## Initialization
+## Define Parameters
 N    <- 1000
 beta <- c(0.2,-0.1)
-opts <- list("algorithm"="NLOPT_LN_COBYLA","xtol_rel"=1.0e-8, "maxeval"=10e8)
 rep  <- 1000
 
-# Logit obj. function
+# Define logit objective function
 logit_obj <- function(beta, y, X) {
              prob <- exp (X%*%beta ) /(1+ exp(X%*%beta ))
              l    <- log(y*prob + (1-y)*(1 - prob))  # log-likelihood
@@ -31,17 +30,18 @@ tic()
 
 results <- do.call(rbind, mclapply(1:rep, function(i){
   
-  # 1. simulate data
+  # 1. Simulate Data
   const   <- matrix(1,N)
   X       <- cbind(const, rchisq(N, 10, ncp = 0))
   epsilon <- -rlogis(N,0,1)
   y       <- as.numeric(X%*%beta > epsilon)
-  # 2. compute solution
+  
+  # 2. Run optimization 
   res     <- optim(c(1,-2), logit_obj, gr = NULL, method ="BFGS", hessian=TRUE, X=X, y=y)$par
   
 }))
 
-# Display Output
+#  Show and Plot results
 colMeans(results)
 std.error(results)
 plot(density(results[,1]))
