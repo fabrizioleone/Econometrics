@@ -1,4 +1,4 @@
-% Monte Carlo Simulation - Logit Model 
+% Monte Carlo Simulation - Probit Model 
 % Fabrizio Leone
 % 06 - 02 - 2019
 
@@ -22,7 +22,7 @@ nH          = NaN(repetitions,2,2);
 tic
 
 % Monte Carlo
- for i = 1: repetitions
+for i = 1: repetitions
 
 % 1. Simulate Data
 const      = ones(N,1);
@@ -41,7 +41,9 @@ objfun     = @(b) nll_probit (b,y,x);
 
 mean(betahat) 
 std(betahat)
+figure(1)
 ksdensity(betahat(:,1))
+figure(2)
 ksdensity(betahat(:,2))
    
    
