@@ -1,0 +1,55 @@
+% Monte Carlo Simulation - Logit Model 
+% Fabrizio Leone
+% 06 - 02 - 2019
+
+clear all
+clc
+
+ % parameters for data generating process
+N           = 100;
+beta        = [-0.2,-0.1]';
+startvalues = [0,0]';
+options     = optimoptions('fminunc','Display','off','GradObj','on','MaxIter',100000);
+rng(10);
+
+ % parameters and initialization for Monte Carlo
+repetitions = 1000;  
+betahat     = NaN(repetitions, 2);
+nll         = NaN(repetitions,1);
+ns          = NaN(repetitions,2);
+nH          = NaN(repetitions,2,2);
+
+
+% Monte Carlo
+ for i = 1: repetitions
+     
+% generate data
+yedu = chi2rnd (10 ,N ,1) ; % years of education
+const = ones(N,1);
+X=[const,yedu];
+epsilon0 =- evrnd (0,1,N ,1);
+epsilon1 =- evrnd (0,1,N ,1);
+epsilon = epsilon0 - epsilon1 ; % difference between 2 type 1 extreme value variables follows logistic distribution
+smoking =  X*beta>epsilon ; %data generated from the logit model
+
+% estimate probit model
+objfun = @(b) nll_probit (b,smoking,X); % define objective function with scalar b as argument
+[betahat(i,:),nll,~,~,ns(i,:),nH(i,:,:)] = fminunc (objfun , startvalues , options);
+
+ end
+ 
+%mean and standard deviation 
+
+mean1=mean(betahat); %mean betahat estimated with the probit model
+mean2=mean(betahat2); %mean betahat estimated with the logit model
+std1=std(betahat); %std betahat estimated with the probit model
+std2=std(betahat2); %std betahat estimated with the logit model
+
+disp(['mean probit model= ', num2str( mean1)])
+disp(['mean logit model= ', num2str( mean2)])
+disp(['std probit model= ', num2str( std1)])
+disp(['std logit model= ', num2str( std2)])
+   
+   
+   
+   

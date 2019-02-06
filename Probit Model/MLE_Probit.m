@@ -1,20 +1,19 @@
 % Monte Carlo Simulation - Logit Model 
 % Fabrizio Leone
-% 05 - 02 - 2019
+% 06 - 02 - 2019
 
 clear all
-close all
 clc
-rng(10)
 
-% Define Parameters
+% Define Paramters
 N           = 1000;
-beta        =[-0.2,-0.1]';
+beta        = [-0.2,-0.1]';
 startvalues = [0,0]';
-options     = optimoptions('fminunc','Display','off','GradObj','on');
- 
+repetitions = 1000;  
+options     = optimoptions('fminunc','Display','off','GradObj','on','MaxIter',100000);
+rng(10);
+
 % Preallocate matrices
-repetitions = 1000;
 betahat     = NaN(repetitions, 2);
 nll         = NaN(repetitions,1);
 ns          = NaN(repetitions,2);
@@ -27,12 +26,10 @@ tic
 
 % 1. Simulate Data
 const      = ones(N,1);
-x          =[const , chi2rnd(10,N,1)];
-epsilon0   = - evrnd (0,1,N ,1);
-epsilon1   = - evrnd (0,1,N ,1);
-epsilon    = epsilon0 - epsilon1; % difference between 2 type 1 extreme value variables follows logistic distribution
-y          =  x*beta > epsilon ;
-objfun     = @(b) nll_logit (b,y,x); 
+x          = [const , chi2rnd(10,N,1)];
+epsilon    = randn(N,1);
+y          = x*beta > epsilon ;
+objfun     = @(b) nll_probit (b,y,x); 
 
 % 2. Run optimization 
 [betahat(i,:),nll,~,~,ns(i,:),nH(i,:,:)] = fminunc (objfun , startvalues , options);
@@ -46,10 +43,6 @@ mean(betahat)
 std(betahat)
 ksdensity(betahat(:,1))
 ksdensity(betahat(:,2))
- 
-
-
-   
    
    
    
