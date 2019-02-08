@@ -24,9 +24,9 @@ data           = CSV.read("data.csv", header=0, normalizenames=true)
 IDmkt          = data[:,1];                                                    # Market identifier
 IDprod         = data[:,2];                                                    # Product identifier
 share          = data[:,3];                                                    # Market share
-A              = Array{Union{Missing, Float64},2}(data[:,4:6]);                # Product characteristics
+A              = Array{Float64,2}(data[:,4:6]);                                # Product characteristics
 price          = data[:,7];                                                    # Price
-z              = Array{Union{Missing, Float64},2}(data[:,8:10]);               # Instruments
+z              = Array{Float64,2}(data[:,8:10]);                               # Instruments
 TM             = maximum(IDmkt);                                               # Number of markets
 prods          = Array{Int64,1}(zeros(TM));                                    # Number of products in each market
 for m=1:TM
@@ -63,3 +63,8 @@ true_vals      = [3, 3, 0.5, 0.5, -2, 0.8, 0.5, 0.5, 0.5]';
 x0             = rand(Kbeta+Ktheta,1);                                         #  Random starting values
 x_L            = [-Inf*ones(Kbeta,1);zeros(Ktheta,1)];                         #  Lower bounds is zero for standard deviations of random coefficients
 x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #  Upper bounds for standard deviations of random coefficients
+function fun(x)
+    Obj_function(x[1:9],X,A,price,v,TM,sharesum,Z,W)
+end
+
+res  = Optim.optimize(fun,x0)
