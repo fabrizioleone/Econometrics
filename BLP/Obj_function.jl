@@ -41,7 +41,6 @@ end
 
 
 #------------- Specify Gradient------------#
-
 sim_share_ijm = num./den;
 d1            = zeros(25,25,50);
 d2            = zeros(970,4);

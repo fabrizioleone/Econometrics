@@ -56,7 +56,7 @@ v              = rand(Normal(0,1),Ktheta,nn);                                  #
 X              = [ones(size(A,1),1) A price];                                  #  Covariates
 Z              = [ones(Total,1) A z A.^2 z.^2];                                #  Instruments
 nZ             = size(Z,2);                                                    #  Number of instrumental variables
-W              = (Z'*Z)\I;                                                     #  Starting GMM weighting matrix
+W              = Z'*Z\I;                                                       #  Starting GMM weighting matrix
 true_vals      = Array{Float64,2}([3 3 0.5 0.5 -2 0.8 0.5 0.5 0.5]');
 x0             = rand(Normal(0,1),Kbeta+Ktheta,1);                             #  Random starting values
 x_L            = [-Inf*ones(Kbeta,1);zeros(Ktheta,1)];                         #  Lower bounds is zero for standard deviations of random coefficients
@@ -81,6 +81,11 @@ function gf!(G,x)
 end
 
 @time res      = optimize(fun, gf!, x_L, x_U, true_vals)
-[ true_vals res.minimizer]
+[ true_vals res.minimizer ]
 
 #------------- Obtain standard errors-------------#
+
+
+ # To be done:
+ # 1. understand why the code is so slow: check how fun and gf! are called
+ # 2. check if matrix multiplications in obj_function takes much time and memory
