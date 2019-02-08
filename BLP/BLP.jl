@@ -81,6 +81,6 @@ function gf!(G,x)
 end
 
 @time res      = optimize(fun, gf!, x_L, x_U, true_vals)
-res.minimizer
+[ true_vals res.minimizer]
 
 #------------- Obtain standard errors-------------#
