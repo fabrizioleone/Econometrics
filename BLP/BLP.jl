@@ -64,9 +64,10 @@ x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #
 
 #------------- Run Optimization - 1st Stage-------------#
 function fun(x)
-    Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W)
+    Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)
 end
 
 @time res  = optimize(fun, x_L, x_U, true_vals)
 
 #------------- Obtain standard errors-------------#
+Obj_function(x0,X,A,price,v,TM,sharesum,share,Z,W, IDmkt, IDprod)
