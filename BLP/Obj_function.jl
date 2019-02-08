@@ -2,7 +2,10 @@
 # Fabrizio Leone
 # 07 - 02 - 2019
 
-function Obj_function(x0,X,A,price,v,TM,sharesum,share,Z,W)
+function Obj_function(x0::Vector{Float64},X::Matrix{Float64},A::Matrix{Float64},
+                     price::Vector{Float64},v::Matrix{Float64},TM::Int64,
+                     sharesum::Matrix{Float64},share::Matrix{Float64},
+                     Z::Matrix{Float64},W::Matrix{Float64})
 
 #------------- Initialize Parameters-------------#
 tol_inner  = 1.e-14;                                 # Tolerance for inner loop (NFXP)
@@ -33,7 +36,7 @@ end
      g         = Z'*xi;                              # Moment conditions GMM
 
      # Step 4: Update GMM objective function
-     f         = tr(g'*W*g);
+     f         = tr(g'*W*g);                         # Take trace to ensure f is Float64
 
 return f
 

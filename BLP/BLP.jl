@@ -67,6 +67,6 @@ function fun(x)
     Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W)
 end
 
-@time res  = optimize(fun, x_L, x_U, ones(9))
+@time res  = optimize(fun, x_L, x_U, true_vals)
 
 #------------- Obtain standard errors-------------#
