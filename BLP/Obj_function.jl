@@ -2,7 +2,7 @@
 # Fabrizio Leone
 # 07 - 02 - 2019
 
-function Obj_function(x0::Matrix{Float64},X::Matrix{Float64},A::Matrix{Float64},
+function Obj_function(x0::Vector{Float64},X::Matrix{Float64},A::Matrix{Float64},
                      price::Vector{Float64},v::Matrix{Float64},TM::Int64,
                      sharesum::Matrix{Float64},share::Vector{Float64},
                      Z::Matrix{Float64},W::Matrix{Float64},IDmkt::Vector{Int64},
@@ -19,16 +19,16 @@ delta      = X*theta1;
 while norm_max > tol_inner  && ii < 1000
 
      # Step 1: Simulated market shares
-     global num       = delta.*exp.([A price]*(theta2.*v)); # Numerator of simulated integral
-     global den       = ones(TM,1).+sharesum*num;           # Denominator of simulated integral
+     global num= delta.*exp.([A price]*(theta2.*v)); # Numerator of simulated integral
+     global den= ones(TM,1).+sharesum*num;           # Denominator of simulated integral
      den       = sharesum'*den;                      # Denominator of simulated integral
      sim_share = mean(num./den,dims=2);              # Simulated shares
 
      # Step 2: Compute a new delta by BLP inversion and compute norm_max
      global delta_new = delta.*(share./sim_share);   # BLP contraction mapping
      norm_max  = maximum(abs.(delta_new - delta));   # Find maximum of Euclidean distance
-     global delta     = delta_new;                          # Update delta
-     global ii        += 1                                  # Update counter
+     delta     = delta_new;                          # Update delta
+     ii        += 1                                  # Update counter
 
 end
 
@@ -40,7 +40,7 @@ end
      f         = tr(g'*W*g);                         # Take trace to ensure f is Float64
 
 
-#------------- Speficy Gradient------------#
+#------------- Specify Gradient------------#
 
 sim_share_ijm = num./den;
 d1            = zeros(25,25,50);
@@ -55,7 +55,7 @@ for m = 1:TM
         if p == pp
             d1[pp,p,m] = mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(ones(1,size(v)[2])-sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:]));
         else
-            d1[pp,p,m]=  -mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(sim_share_ijm[(IDmkt.==m) .& (IDprod.==pp),:]));
+            d1[pp,p,m] = -mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(sim_share_ijm[(IDmkt.==m) .& (IDprod.==pp),:]));
         end
         end
     end
@@ -72,11 +72,10 @@ end
 Grad_fun[:,6:9] = D1;
 Grad_fun[:,1:5] = -X;
 
-
 # 2. Compute gradient
 gradf     = 2*Grad_fun'*Z*W*Z'*xi;
 
 
-return f, Grad_fun
+return f, gradf
 
 end

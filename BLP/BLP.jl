@@ -64,10 +64,23 @@ x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #
 
 #------------- Run Optimization - 1st Stage-------------#
 function fun(x)
-    Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)
+    Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[1]
 end
 
-@time res  = optimize(fun, x_L, x_U, true_vals)
+function gf!(G,x)
+    grad       = Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[2]
+    G[1]       = grad[1]
+    G[2]       = grad[2]
+    G[3]       = grad[3]
+    G[4]       = grad[4]
+    G[5]       = grad[5]
+    G[6]       = grad[6]
+    G[7]       = grad[7]
+    G[8]       = grad[8]
+    G[9]       = grad[9]
+end
+
+@time res      = optimize(fun, gf!, x_L, x_U, true_vals)
+res.minimizer
 
 #------------- Obtain standard errors-------------#
-Obj_function(x0,X,A,price,v,TM,sharesum,share,Z,W, IDmkt, IDprod)
