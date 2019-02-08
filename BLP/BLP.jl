@@ -59,7 +59,7 @@ X              = [ones(size(A,1),1) A price];                                  #
 Z              = [ones(Total,1) A z A.^2 z.^2];                                #  Instruments
 nZ             = size(Z,2);                                                    #  Number of instrumental variables
 W              = (Z'*Z)\I;                                                     #  Starting GMM weighting matrix
-true_vals      = [3, 3, 0.5, 0.5, -2, 0.8, 0.5, 0.5, 0.5]';
+true_vals      = Array{Float64,1}([3; 3; 0.5; 0.5; -2; 0.8; 0.5; 0.5; 0.5]);
 x0             = rand(Kbeta+Ktheta,1);                                         #  Random starting values
 x_L            = [-Inf*ones(Kbeta,1);zeros(Ktheta,1)];                         #  Lower bounds is zero for standard deviations of random coefficients
 x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #  Upper bounds for standard deviations of random coefficients
@@ -67,4 +67,4 @@ function fun(x)
     Obj_function(x[1:9],X,A,price,v,TM,sharesum,Z,W)
 end
 
-res  = Optim.optimize(fun,x0)
+@time res  = optimize(fun, x_L, x_U, x0)
