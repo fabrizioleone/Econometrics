@@ -1,7 +1,7 @@
 function fg!(F, G, x)
     tol_inner  = 1.e-14;                                 # Tolerance for inner loop (NFXP)
-    theta1     = x[1:5];                                # Linear parameters
-    theta2     = x[6:9];                                # Non Linear Paramters
+    theta1     = x[1:5];                                 # Linear parameters
+    theta2     = x[6:9];                                 # Non Linear Paramters
     ii         = 0;
     norm_max   = 1;
     delta      = X*theta1;
