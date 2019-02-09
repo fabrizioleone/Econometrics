@@ -80,9 +80,11 @@ function gf!(G,x)
     G[9]       = grad[9]
 end
 
-od = OnceDifferentiable(fun, gf!, x0)
+ODJ = OnceDifferentiable(fun, gf!, x0)
+NLSolversBase.value_gradient!(ODJ, x0)
+gradient(ODJ)
 
-@time res      = optimize(od, x0, BFGS())
+@time res      = optimize(ODJ, x0, BFGS())
 #[ true_vals res.minimizer ]
 
 #------------- Obtain standard errors-------------#
