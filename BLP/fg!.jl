@@ -1,7 +1,7 @@
 function fg!(F, G, x)
     tol_inner  = 1.e-14;                                 # Tolerance for inner loop (NFXP)
-    theta1     = x0[1:5];                                # Linear parameters
-    theta2     = x0[6:9];                                # Non Linear Paramters
+    theta1     = x[1:5];                                # Linear parameters
+    theta2     = x[6:9];                                # Non Linear Paramters
     ii         = 0;
     norm_max   = 1;
     delta      = X*theta1;
@@ -29,16 +29,17 @@ function fg!(F, G, x)
          # Step 4: Update GMM objective function
          f         = g'*W*g;
 
-
     #------------- Specify Gradient------------#
-if !(G==nothing)
-    sim_share_ijm = num./den;
-    d1            = zeros(25,25,50);
-    d2            = zeros(970,4);
-    D1            = zeros(970,4);
-    Grad_fun      = zeros(970,9);
+    if !(G==nothing)
+         sim_share_ijm = num./den;
+         d1            = zeros(25,25,50);
+         d2            = zeros(970,4);
+         D1            = zeros(970,4);
+         Grad_fun      = zeros(970,9);
 
     # 1. Compute Jacobian Matrix
+
+    # partial share\ partial theta2
     for m = 1:TM
         for p = 1:prods[m]
             for pp = 1:prods[m]
@@ -51,6 +52,7 @@ if !(G==nothing)
         end
     end
 
+    # partial share\ partial sigma
     for j = 2:size(X,2)
         d2[:,j-1] = mean(v[j-1,:]'.*sim_share_ijm.*(X[:,j] .- sharesum'*(sharesum*(X[:,j].*sim_share_ijm))),dims=2);
     end
@@ -61,7 +63,9 @@ if !(G==nothing)
 
     Grad_fun[:,6:9] = D1;
     Grad_fun[:,1:5] = -X;
-    grad     = 2*Grad_fun'*Z*W*Z'*xi;
+
+    # 1. Compute gradient
+    grad       = 2*Grad_fun'*Z*W*Z'*xi;
     G[1]       = grad[1]
     G[2]       = grad[2]
     G[3]       = grad[3]
@@ -71,11 +75,12 @@ if !(G==nothing)
     G[7]       = grad[7]
     G[8]       = grad[8]
     G[9]       = grad[9]
-end
+    end
 
-
+    #------------- Specify Objective Function ------------#
     if !(F == nothing)
-         f = tr(f)                                             # take trace of f to ensure it is Float64
+        f         = tr(f);                             # take trace of f to ensure it is Float64
         return f
     end
+
 end

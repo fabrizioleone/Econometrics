@@ -56,36 +56,47 @@ v              = rand(Normal(0,1),Ktheta,nn);                                  #
 X              = [ones(size(A,1),1) A price];                                  #  Covariates
 Z              = [ones(Total,1) A z A.^2 z.^2];                                #  Instruments
 nZ             = size(Z,2);                                                    #  Number of instrumental variables
-W              = Z'*Z\I;                                                       #  Starting GMM weighting matrix
-true_vals      = Array{Float64,2}([3 3 0.5 0.5 -2 0.8 0.5 0.5 0.5]');
-x0             = rand(Normal(0,1),Kbeta+Ktheta,1);                             #  Random starting values
+W              = inv(Z'*Z);                                                    #  Starting GMM weighting matrix
+true_vals      = Array{Float64,2}([3 3 0.5 0.5 -2 0.8 0.5 0.5 0.5]');          #  True values used to generate the data
+x0             = Array{Float64,2}([-0.5 -1 2 1 3 1.2 3 1 0.01]');              #  Random starting values
 x_L            = [-Inf*ones(Kbeta,1);zeros(Ktheta,1)];                         #  Lower bounds is zero for standard deviations of random coefficients
 x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #  Upper bounds for standard deviations of random coefficients
 
 #------------- Run Optimization - 1st Stage-------------#
-function fun(x)
-    Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[1]
-end
+#function fun(x)
+#    Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[1]
+#end
 
-function gf!(G,x)
-    grad       = Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[2]
-    G[1]       = grad[1]
-    G[2]       = grad[2]
-    G[3]       = grad[3]
-    G[4]       = grad[4]
-    G[5]       = grad[5]
-    G[6]       = grad[6]
-    G[7]       = grad[7]
-    G[8]       = grad[8]
-    G[9]       = grad[9]
-end
+#function gf!(G,x)
+#    grad       = Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[2]
+#    G[1]       = grad[1]
+#    G[2]       = grad[2]
+#    G[3]       = grad[3]
+#    G[4]       = grad[4]
+#    G[5]       = grad[5]
+#    G[6]       = grad[6]
+#    G[7]       = grad[7]
+#    G[8]       = grad[8]
+#    G[9]       = grad[9]
+#end
 
-ODJ = OnceDifferentiable(fun, gf!, x0)
+### TRIAL SECTION
+
+#ODJ = OnceDifferentiable(fun, gf!, x0)
+#NLSolversBase.value_gradient!(ODJ, x0)
+#gradient(ODJ)
+
+#@time res      = optimize(ODJ, x0, BFGS())
+#@time res      = optimize(fun,gf! x0, BFGS())
+#[ true_vals res.minimizer ]
+
+
+## trial 2
+
+ODJ = OnceDifferentiable(only_fg!(fg!), x0)
 NLSolversBase.value_gradient!(ODJ, x0)
 gradient(ODJ)
-
-@time res      = optimize(ODJ, x0, BFGS())
-#[ true_vals res.minimizer ]
+@time res1 = Optim.optimize(ODJ,x_L,x_U,x0)
 
 #------------- Obtain standard errors-------------#
 
@@ -94,3 +105,5 @@ gradient(ODJ)
  # 1. understand why the code is so slow: check how fun and gf! are called
  # 2. check if matrix multiplications in obj_function takes much time and memory
  # 3. check why estimates are not precise
+
+ res1.minimizer

@@ -53,7 +53,7 @@ for m = 1:TM
     for p = 1:prods[m]
         for pp = 1:prods[m]
         if p == pp
-            d1[pp,p,m] = mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(ones(1,size(v)[2])-sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:]));
+            d1[pp,p,m] = mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(ones(1,size(v)[2]).-sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:]));
         else
             d1[pp,p,m] = -mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(sim_share_ijm[(IDmkt.==m) .& (IDprod.==pp),:]));
         end
@@ -75,6 +75,6 @@ Grad_fun[:,1:5] = -X;
 # 2. Compute gradient
 grad     = 2*Grad_fun'*Z*W*Z'*xi;
 
-return f, gradf
+return f, grad
 
 end
