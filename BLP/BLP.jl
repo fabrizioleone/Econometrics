@@ -80,8 +80,10 @@ function gf!(G,x)
     G[9]       = grad[9]
 end
 
-@time res      = optimize(fun, gf!, x_L, x_U, true_vals)
-[ true_vals res.minimizer ]
+od = OnceDifferentiable(fun, gf!, x0)
+
+@time res      = optimize(od, x0, BFGS())
+#[ true_vals res.minimizer ]
 
 #------------- Obtain standard errors-------------#
 

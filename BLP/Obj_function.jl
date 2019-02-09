@@ -41,6 +41,7 @@ end
 
 
 #------------- Specify Gradient------------#
+
 sim_share_ijm = num./den;
 d1            = zeros(25,25,50);
 d2            = zeros(970,4);
@@ -72,8 +73,7 @@ Grad_fun[:,6:9] = D1;
 Grad_fun[:,1:5] = -X;
 
 # 2. Compute gradient
-gradf     = 2*Grad_fun'*Z*W*Z'*xi;
-
+grad     = 2*Grad_fun'*Z*W*Z'*xi;
 
 return f, gradf
 
