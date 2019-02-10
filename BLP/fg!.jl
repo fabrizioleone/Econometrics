@@ -9,8 +9,8 @@ function fg!(F, G, x)
     while norm_max > tol_inner  && ii < 1000
 
          # Step 1: Simulated market shares
-         num       = delta.*exp.([A price]*(theta2.*v)); # Numerator of simulated integral
-         den       = ones(TM,1).+sharesum*num;           # Denominator of simulated integral
+         global num= delta.*exp.([A price]*(theta2.*v)); # Numerator of simulated integral
+         global den= ones(TM,1).+sharesum*num;           # Denominator of simulated integral
          den       = sharesum'*den;                      # Denominator of simulated integral
          sim_share = mean(num./den,dims=2);              # Simulated shares
 
@@ -31,6 +31,7 @@ function fg!(F, G, x)
 
     #------------- Specify Gradient------------#
     if !(G==nothing)
+         sim_share_ijm = num./den;
          d1            = zeros(25,25,50);
          d2            = zeros(970,4);
          D1            = zeros(970,4);
@@ -43,9 +44,9 @@ function fg!(F, G, x)
         for p = 1:prods[m]
             for pp = 1:prods[m]
             if p == pp
-                d1[pp,p,m] = mean(share[(IDmkt.==m) .& (IDprod.==p),:].*(ones(1,size(v)[2]).-share[(IDmkt.==m) .& (IDprod.==p),:]));
+                d1[pp,p,m] = mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(ones(1,size(v)[2]).-sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:]));
             else
-                d1[pp,p,m] = -mean(share[(IDmkt.==m) .& (IDprod.==p),:].*(share[(IDmkt.==m) .& (IDprod.==pp),:]));
+                d1[pp,p,m] = -mean(sim_share_ijm[(IDmkt.==m) .& (IDprod.==p),:].*(sim_share_ijm[(IDmkt.==m) .& (IDprod.==pp),:]));
             end
             end
         end
@@ -53,7 +54,7 @@ function fg!(F, G, x)
 
     # partial share\ partial sigma
     for j = 2:size(X,2)
-        d2[:,j-1] = mean(v[j-1,:]'.*share.*(X[:,j] .- sharesum'*(sharesum*(X[:,j].*share))),dims=2);
+        d2[:,j-1] = mean(v[j-1,:]'.*sim_share_ijm.*(X[:,j] .- sharesum'*(sharesum*(X[:,j].*sim_share_ijm))),dims=2);
     end
 
     for m = 1:TM

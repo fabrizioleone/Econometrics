@@ -77,3 +77,5 @@ ODJ            = OnceDifferentiable(only_fg!(fg!), x0)
  # 3. check why estimates are not precise
 
  res1.minimizer
+
+ 
