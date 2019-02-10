@@ -11,14 +11,14 @@ source("Obj_function.R")
 
 #----------- Import and Tidy Data ----------- #
 DATA           <- read.csv("~/Documents/GitHub/Econometrics/BLP/data.csv", header=FALSE)
-IDmkt          <- DATA[,1]                 # Market identifier
-IDprod         <- DATA[,2]                 # Product identifier
-share          <- DATA[,3]                 # Market share
-A              <- DATA[,4:6]               # Product characteristics
-price          <- DATA[,7]                 # Price
-z              <- DATA[,8:10]              # Instruments
-TM             <- max(IDmkt)               # Number of markets
-prods          <- rep(0,TM)                # Number of products in each market
+IDmkt          <- DATA[,1]                                 # Market identifier
+IDprod         <- DATA[,2]                                 # Product identifier
+share          <- DATA[,3]                                 # Market share
+A              <- DATA[,4:6]                               # Product characteristics
+price          <- DATA[,7]                                 # Price
+z              <- DATA[,8:10]                              # Instruments
+TM             <- max(IDmkt)                               # Number of markets
+prods          <- rep(0,TM)                                # Number of products in each market
 for (m in 1:TM){
 prods[m]       <- max(IDprod[IDmkt==m])
 }
@@ -26,15 +26,15 @@ T              <- matrix(0,TM,2)
 T[1,1]         <- 1
 T[1,2]         <- prods[1] 
 for (i in 2:TM){
-T[i,1]         <- T[i-1,2]+1                # 1st Column market starting point
-T[i,2]         <- T[i,1]+prods[i]-1         # 2nd Column market ending point
+T[i,1]         <- T[i-1,2]+1                                # 1st Column market starting point
+T[i,2]         <- T[i,1]+prods[i]-1                         # 2nd Column market ending point
 }
-Total          <- T[TM,2]                   # # of obsevations
-TotalProd      <- max(prods)                # Max # of products in a given market
+Total          <- T[TM,2]                                   # Number of obsevations
+TotalProd      <- max(prods)                                # Max number of products in a given market
 # Sparse matrices
-#sharesum1       <- as.matrix.csr(matrix(0, TM, Total));     # Used to create denominators in predicted shares (i.e. sums numerators)
-#denomexpand1    <- as.matrix.csr(matrix(0, Total, 1))       # Used to create denominators in predicted shares (expands sum numerators)
-sharesum        <- matrix(0, TM, Total);    # Used to create denominators in predicted shares (i.e. sums numerators)
+#sharesum1       <- as.matrix.csr(matrix(0, TM, Total));    # Used to create denominators in predicted shares (i.e. sums numerators)
+#denomexpand1    <- as.matrix.csr(matrix(0, Total, 1))      # Used to create denominators in predicted shares (expands sum numerators)
+sharesum        <- matrix(0, TM, Total);                    # Used to create denominators in predicted shares (i.e. sums numerators)
 denomexpand     <- matrix(0, Total, 1);  
 #object.size(sharesum1) object.size(sharesum)
 for (i in 1:TM){

@@ -27,8 +27,8 @@ Obj_function <- function(x0, X, A, price, share, v, nn,  Z, sharesum,TM,W){
   }
   
   #step 3: get the implied structural errors 
-  xi        <- log(delta_new) - as.matrix(X)%*%theta1          # Updated moment condition  
-  g         <- t(Z)%*%xi;                                        # Moment conditions GMM
+  xi        <- log(delta_new) - as.matrix(X)%*%theta1          # Updated structural error  
+  g         <- t(Z)%*%xi;                                      # Moment conditions GMM
   
   
   #step 4: update GMM objective function
