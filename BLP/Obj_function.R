@@ -1,6 +1,6 @@
 #### GMM Objective functin ####
-Obj_function <- function(x0, X, A, price, share, v, nn,  Z, sharesum,TM,W){
-  
+Obj_function <- function(x0, X, A, price, share, v, nn,  Z, sharesum, W, prods, IDmkt, IDprod){
+ 
   # Initialize parameters
   theta1     <- x0[1:5]
   theta2     <- x0[6:9]              
@@ -8,6 +8,10 @@ Obj_function <- function(x0, X, A, price, share, v, nn,  Z, sharesum,TM,W){
   norm_max   <- 1
   delta      <- as.matrix(X)%*%theta1
   tol_inner  <- 1.e-14                           # Tolerance for inner loop (NFXP)
+  TM         <- 50
+  yyy = prods 
+  yyyy = IDmkt
+  yyyyyyyy = IDprod
   
   while (norm_max > tol_inner  && ii<1000) {        
     
@@ -32,13 +36,15 @@ Obj_function <- function(x0, X, A, price, share, v, nn,  Z, sharesum,TM,W){
   
   
   #step 4: update GMM objective function
-  f         <- t(g)%*%W%*%g;                              
+  f         <- t(g)%*%W%*%g;  
   
-  if (is.na(f)){
-    return(10e5)
-  } else {
-    return(f)
-  }
+  
+  #step 5: gradient
+  #gradient  <- Gr_function(num, den, prods, IDmkt, IDprod, X, v, Z, W, xi)
+  
+  #return(list(f, gradient))
+  
+  return(f)
   
 }
 

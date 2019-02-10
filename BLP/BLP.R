@@ -8,6 +8,7 @@ set.seed(10)
 clr <- function(){cat(rep("\n", 50))}   
 setwd("~/Documents/GitHub/Econometrics/BLP")
 source("Obj_function.R")
+#source("Gr_function.R")
 
 #----------- Import and Tidy Data ----------- #
 DATA           <- read.csv("~/Documents/GitHub/Econometrics/BLP/data.csv", header=FALSE)
@@ -61,16 +62,18 @@ x_U           <- Inf*matrix(1,Kbeta+Ktheta,1)
 tic()
 cl            <- makeCluster(detectCores()); setDefaultCluster(cl = cl)
 res           <- optimParallel(x0, Obj_function, gr = NULL, method = "L-BFGS-B", lower = x_L, upper = x_U,
-                       X  = X, 
-                       A  = A,
-                       price = price,
-                       share = share,
-                       v = v,
-                       nn = nn,
-                       Z = Z,
-                       sharesum = sharesum,
-                       TM = TM,
-                       W = W)
+                              X        = X, 
+                              A        = A,
+                              price    = price,
+                              share    = share,
+                              v        = v,
+                              nn       = nn,
+                              Z        = Z,
+                              sharesum = sharesum,
+                              W        = W,
+                              prods    = prods,
+                              IDmkt    = IDmkt,
+                              IDprod   = IDprod)
 
 toc()
 
