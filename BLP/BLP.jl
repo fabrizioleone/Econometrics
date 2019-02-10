@@ -66,7 +66,7 @@ x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #
 ODJ            = OnceDifferentiable(only_fg!(fg!), x0)
 #NLSolversBase.value_gradient!(ODJ, x0)
 #gradient(ODJ)
-@time @profiler es1 = Optim.optimize(ODJ,x_L,x_U,x0)
+@time @profiler res1 = Optim.optimize(ODJ,x_L,x_U,x0)
 
 #------------- Obtain standard errors -------------#
 
