@@ -63,7 +63,7 @@ x_L            = [-Inf*ones(Kbeta,1);zeros(Ktheta,1)];                         #
 x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #  Upper bounds for standard deviations of random coefficients
 
 #----------- Run Optimization - 1st Stage ----------#
-ODJ = OnceDifferentiable(only_fg!(fg!), x0)
+ODJ            = OnceDifferentiable(only_fg!(fg!), x0)
 #NLSolversBase.value_gradient!(ODJ, x0)
 #gradient(ODJ)
 @time @profiler es1 = Optim.optimize(ODJ,x_L,x_U,x0)
