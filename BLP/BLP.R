@@ -1,7 +1,7 @@
 #----------- Housekeeping ----------- #
 rm(list = ls(all=TRUE))
 cat("\f")
-Packages <- c("SparseM", "tictoc")
+Packages <- c("SparseM", "tictoc","optimParallel")
 invisible(lapply(Packages, library, character.only = TRUE))
 #dev.off()
 set.seed(10)  
@@ -52,15 +52,15 @@ Z             <- cbind(matrix(1, Total, 1), A, z, A^2, z^2) # Instruments
 nZ            <- dim(Z)[2]                                  # Number of instrumental variables
 W             <- solve(t(Z)%*%as.matrix(Z))                 # Starting GMM weighting matrix
 true_vals     <- c(3, 3, 0.5, 0.5, -2, 0.8, 0.5, 0.5, 0.5)  # True values used to generate data
-x0            <- matrix(rnorm(9),Ktheta+Kbeta)              #random starting values
+x0            <- matrix(rnorm(9),Ktheta+Kbeta)              # Random starting values
 x_L           <- rbind(-Inf*matrix(1,Kbeta,1), matrix(0, Ktheta,1))    # Lower bounds is zero for standard deviations of random coefficients
 x_U           <- Inf*matrix(1,Kbeta+Ktheta,1)    
 
 
 #----------- Run Optimization ----------- #
 tic()
-
-res           <- optim(x0, Obj_function, gr = NULL, method = "L-BFGS-B", lower = x_L, upper = x_U,
+cl            <- makeCluster(detectCores()); setDefaultCluster(cl = cl)
+res           <- optimParallel(x0, Obj_function, gr = NULL, method = "L-BFGS-B", lower = x_L, upper = x_U,
                        X  = X, 
                        A  = A,
                        price = price,
