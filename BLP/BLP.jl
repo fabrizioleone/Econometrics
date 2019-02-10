@@ -62,36 +62,13 @@ x0             = Array{Float64,2}([-0.5 -1 2 1 3 1.2 3 1 0.01]');              #
 x_L            = [-Inf*ones(Kbeta,1);zeros(Ktheta,1)];                         #  Lower bounds is zero for standard deviations of random coefficients
 x_U            = Inf.*ones(Kbeta+Ktheta,1);                                    #  Upper bounds for standard deviations of random coefficients
 
-#------------- Run Optimization - 1st Stage-------------#
-#function fun(x)
-#    Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[1]
-#end
-
-#function gf!(G,x)
-#    grad       = Obj_function(x[1:9],X,A,price,v,TM,sharesum,share,Z,W,IDmkt,IDprod)[2]
-#    G[1]       = grad[1]
-#    G[2]       = grad[2]
-#    G[3]       = grad[3]
-#    G[4]       = grad[4]
-#    G[5]       = grad[5]
-#    G[6]       = grad[6]
-#    G[7]       = grad[7]
-#    G[8]       = grad[8]
-#    G[9]       = grad[9]
-#end
-
-#@time res      = optimize(fun,gf! x0, BFGS())
-#[ true_vals res.minimizer ]
-
-
-## trial 2
-
+#----------- Run Optimization - 1st Stage ----------#
 ODJ = OnceDifferentiable(only_fg!(fg!), x0)
 #NLSolversBase.value_gradient!(ODJ, x0)
 #gradient(ODJ)
 @time @profiler es1 = Optim.optimize(ODJ,x_L,x_U,x0)
 
-#------------- Obtain standard errors-------------#
+#------------- Obtain standard errors -------------#
 
 
  # To be done:
