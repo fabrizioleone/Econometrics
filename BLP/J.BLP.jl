@@ -70,10 +70,9 @@ ODJ            = OnceDifferentiable(only_fg!(fg!), x0)
 
 #------------- Obtain standard errors -------------#
 
-
  # To be done:
  # 1. understand why the code is so slow: check how fun and gf! are called
  # 2. check if matrix multiplications in obj_function takes much time and memory
  # 3. check why estimates are not precise
 
- res1.minimizer
+[true_vals , res1.minimizer]
