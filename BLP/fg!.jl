@@ -1,6 +1,5 @@
 #------------- Objective function and Gradient------------#
 
-
 function fg!(F, G, x)
     tol_inner  = 1.e-14;                                 # Tolerance for inner loop (NFXP)
     theta1     = x[1:5];                                 # Linear parameters

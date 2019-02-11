@@ -1,3 +1,7 @@
+# BLP
+## Fabrizio Leone
+## 11 - 02 - 2019
+
 #----------- Housekeeping ----------- #
 rm(list = ls(all=TRUE))
 cat("\f")
@@ -78,7 +82,7 @@ x_U             <- Inf*matrix(1,Kbeta+Ktheta,1)
 #toc()
 
 #----------- Run Optimization (With gradient) ----------- #
-tic()
+#tic()
 res              <- nlminb(x0, Obj_function, gr = attr(Obj_function, "gradient"), lower = x_L, upper = x_U,
                            X        = X, 
                            A        = A,
@@ -94,6 +98,9 @@ res              <- nlminb(x0, Obj_function, gr = attr(Obj_function, "gradient")
                            IDprod   = IDprod)
 
 toc()
+
+
+
 
 
 

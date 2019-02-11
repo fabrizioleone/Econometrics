@@ -26,7 +26,6 @@ Obj_function <- function(x0, X, A, price, share, v, nn,  Z, sharesum, W, prods, 
     delta     <- delta_new       
     ii        <- ii+1
     
-    
   }
   
   
