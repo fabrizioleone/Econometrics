@@ -10,7 +10,7 @@ clr <- function(){cat(rep("\n", 50))}
 set.seed(1)
 
 ## Call packages
-Packages <- c("nloptr", "evd", "tictoc", "parallel", "plotrix")
+Packages <- c("nloptr", "evd", "tictoc", "parallel", "plotrix", "GenSA")
 invisible(lapply(Packages, library, character.only = TRUE))
 #invisible(lapply(Packages, install.packages, character.only = TRUE)) # if some package is missing
 
@@ -38,7 +38,7 @@ logit_gr <- function(beta, y, X) {
 # Run simulation
 tic()
 
-results <- do.call(rbind, mclapply(1:rep, function(i){
+results   <- do.call(rbind, mclapply(1:rep, function(i){
   
   # 1. Simulate Data
   const   <- matrix(1,N)
@@ -48,7 +48,7 @@ results <- do.call(rbind, mclapply(1:rep, function(i){
   
   # 2. Run optimization 
   res     <- optim(c(0,0), logit_obj, logit_gr, method ="BFGS", hessian=TRUE, X=X, y=y)$par
-  
+  #res     <- GenSA(c(0,0), logit_obj, c(-Inf,-Inf), c(Inf,Inf),X=X, y=y)$par
 }))
 
 #  Show and Plot results
