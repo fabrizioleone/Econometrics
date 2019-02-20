@@ -7,7 +7,7 @@ rm(list = ls(all=TRUE))
 cat("\f")
 #dev.off()
 clr <- function(){cat(rep("\n", 50))}   
-set.seed(1)
+set.seed(10)
 
 ## Call packages
 Packages <- c("nloptr", "evd", "tictoc", "parallel", "plotrix", "GenSA")

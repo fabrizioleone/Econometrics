@@ -1,4 +1,4 @@
-function [nll, ns] = nll_OrderedProbit(pars,y,x)
+function [nll, ns] = M.nll_OrderedProbit(pars,y,x)
 
  % 1. Objective Function
  thresholds  = [-Inf pars(3) pars(4) Inf];
