@@ -1,0 +1,19 @@
+function [nll] = nll_OrderedProbit(pars,y,x)
+
+ % 1. Objective Function
+ thresholds  = [-Inf pars(3) pars(4) Inf];
+ Xb          = x(:,1).*pars(1)+x(:,2).*pars(2);
+ p           = normcdf((thresholds(y+1)'-Xb)) - normcdf((thresholds(y)'-Xb));
+ nll         = -sum(log(p));
+
+ % 2. Score
+ dLdbeta1    = (y==1).*normpdf(pars(3) - Xb)).*(-x(:,1))...
+             + (y==2).*(normpdf(pars(4) - Xb)
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+end
