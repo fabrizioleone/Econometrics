@@ -12,7 +12,7 @@ N           = 1000;
 beta        = [-0.1; 0.2];                                                 % Coefficients
 alpha       = [-1; 0.5];                                                   % Thresholds
 startvalues = rand(4,1);                                                   % Starting values
-repetitions = 100;
+repetitions = 1000;
 options     = optimoptions('fminunc','Display','off','GradObj','on');
 
 % Preallocate matrices
