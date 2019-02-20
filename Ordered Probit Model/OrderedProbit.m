@@ -11,15 +11,15 @@ rng(10)
 N           = 1000;
 beta        = [-0.1; 0.2];                                                 % Coefficients
 alpha       = [-1; 0.5];                                                   % Thresholds
-startvalues = rand(length(alpha)+length(beta),1);                          % Starting values
+Npar        = length(alpha)+length(beta);
+startvalues = rand(Npar,1);                                                % Starting values
 repetitions = 1000;
 options     = optimoptions('fminunc','Display','off','GradObj','on');
 
 % Preallocate matrices
-thetahat    = NaN(repetitions, 4);
+thetahat    = NaN(repetitions,Npar);
 nll         = NaN(repetitions,1);
-ns          = NaN(repetitions,2);
-nH          = NaN(repetitions,4,4);
+nH          = NaN(repetitions,Npar,Npar);
 
 tic
 
