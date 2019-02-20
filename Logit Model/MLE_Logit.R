@@ -12,7 +12,7 @@ set.seed(10)
 ## Call packages
 Packages <- c("nloptr", "evd", "tictoc", "parallel", "plotrix", "GenSA")
 invisible(lapply(Packages, library, character.only = TRUE))
-#invisible(lapply(Packages, install.packages, character.only = TRUE)) # if some package is missing
+#invisible(lapply(Packages, install.packages, character.only = TRUE)) # uncomment if some package is missing
 
 ## Define Parameters
 N    <- 1000

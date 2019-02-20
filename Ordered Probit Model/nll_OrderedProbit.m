@@ -1,4 +1,4 @@
-function [nll, ns] = M.nll_OrderedProbit(pars,y,x)
+function [nll, ns] = nll_OrderedProbit(pars,y,x)
 
  % 1. Objective Function
  thresholds  = [-Inf pars(3) pars(4) Inf];
@@ -7,7 +7,7 @@ function [nll, ns] = M.nll_OrderedProbit(pars,y,x)
  nll         = - mean(log(p));
 
  % 2. Gradient
-  dLdbeta1    = (y==1).*(normpdf(pars(3) - Xb).*(-x(:,1)))./p...
+ dLdbeta1    = (y==1).*(normpdf(pars(3) - Xb).*(-x(:,1)))./p...
              + (y==2).*(normpdf(pars(4) - Xb) - normpdf(pars(3) - Xb)).*(-x(:,1))./p...
              + (y==3).*normpdf(pars(4) - Xb).*x(:,1)./p;
          
