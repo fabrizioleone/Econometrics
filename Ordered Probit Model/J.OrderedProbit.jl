@@ -23,7 +23,7 @@ N           = 1000;
 beta        = [-0.1; 0.2];                                                      # Coefficients
 alpha       = [-1; 0.5];                                                        # Thresholds
 Npar        = length(alpha)+length(beta);
-startvalues = rand(Normal(0,1),Npar,1);                                         # Starting values
+x0          = rand(Normal(0,1),Npar,1);                                         # Starting values
 repetitions = 1000;
 
 # Define ordered probit objective function
@@ -35,17 +35,54 @@ repetitions = 1000;
 #    return nll
 #end
 
+
+function fg!(F, G, x)
+    thresholds  = [-Inf x[3] x[4] Inf];
+    Xb          = X[:,1].*x[1] + X[:,2].*x[2];
+    p           = cdf.(Normal(0,1),thresholds[y.+1] - Xb) - cdf.(Normal(0,1),thresholds[y] - Xb);
+
+
+    if !(G == nothing)
+    dLdbeta1    = (y.==1).*(pdf.(Normal(0,1), x[3] .- Xb).*(-X[:,1]))./p
+                + (y.==2).*(pdf.(Normal(0,1), x[4] .- Xb) - pdf.(Normal(0,1), x[3] .- Xb)).*(-X[:,1])./p
+                + (y.==3).*pdf.(Normal(0,1), x[4] .- Xb).*X[:,1]./p;
+
+    dLdbeta2    = (y.==1).*(pdf.(Normal(0,1), x[3] .- Xb).*(-X[:,2]))./p
+                + (y.==2).*(pdf.(Normal(0,1), x[4] .- Xb) - pdf.(Normal(0,1), x[3] .- Xb)).*(-X[:,2])./p
+                + (y.==3).*pdf.(Normal(0,1), x[4] .- Xb).*X[:,2]./p;
+
+    dLdalpha1   = (y.==1).*pdf.(Normal(0,1), x[3] .- Xb)./p
+                + (y.==2).*pdf.(Normal(0,1), x[3] .- Xb).*(-1)./p;
+
+    dLdalpha2   = (y.==2).*pdf.(Normal(0,1), x[4] .- Xb)./p
+                + (y.==3).*pdf.(Normal(0,1), x[4] .- Xb).*(-1)./p;
+
+    gradient    = hcat(dLdbeta1, dLdbeta2, dLdalpha1, dLdalpha2);
+    ns          = - mean(gradient,dims=1);
+    G[1]        = ns[1]
+    G[2]        = ns[2]
+    G[3]        = ns[3]
+    G[4]        = ns[4]
+    end
+
+    if !(F == nothing)
+        f         = - mean(log.(p));
+        return f
+    end
+
+end
+
 # Run Monte Carlo Simulation
-beta_hat = zeros(N,Npar)
+beta_hat = zeros(N,Npar);
 
 @time begin
 
 for i = 1:repetitions
 
 # 1. Simulate Data
-x         = rand(Poisson(3),N,2);
+W         = rand(Poisson(3),N,2);
 ϵ         = rand(Normal(0,1),N,1);
-ystar     = x[:,1].*beta[1] + x[:,2].*beta[2] + ϵ
+ystar     = W[:,1].*beta[1] + W[:,2].*beta[2] + ϵ
 y         = Int.(1 .+ (ystar.>alpha[1]) + (ystar.>alpha[2]));
 
 # 2. Run optimization
@@ -54,43 +91,20 @@ y         = Int.(1 .+ (ystar.>alpha[1]) + (ystar.>alpha[2]));
 #end
 
 
+ODJ            = OnceDifferentiable(only_fg!(fg!), x0)
+#NLSolversBase.value_gradient!(ODJ, x0)
+#gradient(ODJ)
+#@time beta_hat[i,:]    = Optim.optimize(ODJ,startvalues)
+ res           = Optim.optimize(ODJ, x0)
+ beta_hat[i,:] = res.minimizer
 
-function fg!(F, G, pars)
-    thresholds  = [-Inf pars[3] pars[4] Inf];
-    Xb          = x[:,1].*pars[1] + x[:,2].*pars[2];
-    p           = cdf.(Normal(0,1),thresholds[y.+1] - Xb) - cdf.(Normal(0,1),thresholds[y] - Xb);
-
-
-    if !(G==nothing)
-    dLdbeta1    = (y==1).*(cdf.(Normal(0,1), pars(3) - Xb).*(-x[:,1]))./p...
-                + (y==2).*(cdf.(Normal(0,1), pars(4) - Xb) - cdf.(Normal(0,1), pars(3) - Xb)).*(-x[:,1])./p...
-                + (y==3).*cdf.(Normal(0,1), pars(4) - Xb).*x[:,1]./p;
-
-   dLdbeta1     = (y==1).*(cdf.(Normal(0,1), pars(3) - Xb).*(-x[:,2]))./p...
-                + (y==2).*(cdf.(Normal(0,1), pars(4) - Xb) - cdf.(Normal(0,1), pars(3) - Xb)).*(-x[:,2])./p...
-                + (y==3).*cdf.(Normal(0,1), pars(4) - Xb).*x[:,2]./p;
-
-    dLdalpha1   = (y==1).*normpdf(pars(3) - Xb)./p...
-                + (y==2).*normpdf(pars(3) - Xb).*(-1)./p;
-
-    dLdalpha2   = (y==2).*normpdf(pars(4) - Xb)./p...
-                + (y==3).*normpdf(pars(4) - Xb).*(-1)./p;
-
-
-    gradient    = [dLdbeta1, dLdbeta2, dLdalpha1, dLdalpha2];
-
-    ns          = - mean(gradient);
-    end
-
-end
-
-
-res  = Optim.optimize(objfun,startvalues)
-beta_hat[i,:]  = res.minimizer
+#res  = Optim.optimize(objfun,startvalues)
+#beta_hat[i,:]  = res.minimizer
 
 end
 
 end
+
 
 # Show and Plot results
 println("Mean Estimates ",sum!([1. 1. 1. 1.], beta_hat)/repetitions)
