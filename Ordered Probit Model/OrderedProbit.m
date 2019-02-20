@@ -1,4 +1,4 @@
-% Monte Carlo Simulation - Ordered Probit Model 
+% Monte Carlo Simulation - Ordered Probit Model (Two Thresholds)
 % Fabrizio Leone
 % 20 - 02 - 2019
 
@@ -11,7 +11,7 @@ rng(10)
 N           = 1000;
 beta        = [-0.1; 0.2];                                                 % Coefficients
 alpha       = [-1; 0.5];                                                   % Thresholds
-startvalues = rand(4,1);                                                   % Starting values
+startvalues = rand(length(alpha)+length(beta),1);                          % Starting values
 repetitions = 1000;
 options     = optimoptions('fminunc','Display','off','GradObj','on');
 

@@ -4,7 +4,7 @@ function [nll, ns] = nll_OrderedProbit(pars,y,x)
  thresholds  = [-Inf pars(3) pars(4) Inf];
  Xb          = x(:,1).*pars(1)+x(:,2).*pars(2);
  p           = normcdf((thresholds(y+1)'-Xb)) - normcdf((thresholds(y)'-Xb));
- nll         = -mean(log(p));
+ nll         = - mean(log(p));
 
  % 2. Gradient
   dLdbeta1    = (y==1).*(normpdf(pars(3) - Xb).*(-x(:,1)))./p...
