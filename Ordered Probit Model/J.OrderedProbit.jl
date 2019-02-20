@@ -27,17 +27,11 @@ startvalues = rand(Normal(0,1),Npar,1);                                         
 repetitions = 1000;
 
 # Define ordered probit objective function
-function nll_OrderedProbit(pars::Array{Float64,1}, y::Array{Float64,2}, x::Array{Float64,2})
-    #thresholds  = [-Inf pars[3] pars[4] Inf];
-    #Xb          = x[:,1].*pars[1] + x[:,2].*pars[2];
-    #p           = cdf.(Normal(0,1),((thresholds[y.+1] - Xb))) - cdf.(Normal(0,1),((thresholds[y] - Xb)));
-    #p           = cdf.(Normal(0,1), (thresholds[y.+1] - Xb) -  (thresholds[y] - Xb));
-    #nll         = - mean(log.(p));
+function nll_OrderedProbit(pars::Array{Float64,1}, y::Array{Int64,2}, x::Array{Int64,2})
+    thresholds  = [-Inf pars[3] pars[4] Inf];
     Xb          = x[:,1].*pars[1] + x[:,2].*pars[2];
-    P           = (y.==1).*log.(cdf.(Normal(0,1), (pars[3] .- Xb)))+
-                  (y.==2).*log.(cdf.(Normal(0,1), (pars[4] .- Xb)) - cdf.(Normal(0,1), (pars[3] .- Xb)))+
-                  (y.==3).*log.(1 .- cdf.(Normal(0,1), (pars[4] .- Xb)))
-    nll         = -mean(P)
+    p           = cdf.(Normal(0,1),thresholds[y.+1] - Xb) - cdf.(Normal(0,1),thresholds[y] - Xb);
+    nll         = - mean(log.(p));
     return nll
 end
 
