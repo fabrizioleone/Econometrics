@@ -67,7 +67,7 @@ results     <- do.call(rbind, mclapply(1:repetitions, function(i){
   
   
   # 2. Run optimization 
-  res       <- optim(startvalues, oprobit_obj, oprobit_gr, method ="BFGS", hessian=TRUE, x=x, y=y)$par
+  res       <- optim(startvalues, oprobit_obj, method ="BFGS", hessian=TRUE, x=x, y=y)$par
   # gradient not working properly
   
 }))

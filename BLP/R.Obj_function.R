@@ -39,7 +39,7 @@ Obj_function <- function(x0, X, A, price, share, v, nn,  Z, sharesum, W, prods, 
   
   
   #step 5: gradient
-  attr(f, "gradient")  <- Gr_function(num, den, prods, IDmkt, IDprod, X, v, Z, W, xi)
+  #attr(f, "gradient")  <- Gr_function(num, den, prods, IDmkt, IDprod, X, v, Z, W, xi)
   
   #return(list(f,gradient))
   

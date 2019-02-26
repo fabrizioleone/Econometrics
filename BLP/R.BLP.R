@@ -11,8 +11,8 @@ invisible(lapply(Packages, library, character.only = TRUE))
 set.seed(10)  
 clr <- function(){cat(rep("\n", 50))}   
 setwd("~/Documents/GitHub/Econometrics/BLP")
-source("Obj_function.R")
-source("Gr_function.R")
+source("R.Obj_function.R")
+source("R.Gr_function.R")
 
 #----------- Import and Tidy Data ----------- #
 DATA           <- read.csv("~/Documents/GitHub/Econometrics/BLP/data.csv", header=FALSE)
@@ -63,41 +63,41 @@ x_U             <- Inf*matrix(1,Kbeta+Ktheta,1)
 
 
 #----------- Run Optimization (No gradient, about 1 hour) ----------- #
-#tic()
-#cl            <- makeCluster(detectCores()); setDefaultCluster(cl = cl)
-#res           <- optimParallel(x0, Obj_function, gr = Gr_function, method = "L-BFGS-B", lower = x_L, upper = x_U,
-#                              X        = X, 
-#                              A        = A,
-#                              price    = price,
-#                              share    = share,
-#                              v        = v,
-#                              nn       = nn,
-#                              Z        = Z,
-#                              sharesum = sharesum,
-#                              W        = W,
-#                              prods    = prods,
-#                              IDmkt    = IDmkt,
-#                              IDprod   = IDprod)
+tic()
+cl            <- makeCluster(detectCores()); setDefaultCluster(cl = cl)
+res           <- optimParallel(x0, Obj_function, method = "L-BFGS-B", lower = x_L, upper = x_U,
+                              X        = X, 
+                              A        = A,
+                              price    = price,
+                              share    = share,
+                              v        = v,
+                              nn       = nn,
+                              Z        = Z,
+                              sharesum = sharesum,
+                              W        = W,
+                              prods    = prods,
+                              IDmkt    = IDmkt,
+                              IDprod   = IDprod)
 
-#toc()
+toc()
 
 #----------- Run Optimization (With gradient) ----------- #
 #tic()
-res              <- nlminb(x0, Obj_function, gr = attr(Obj_function, "gradient"), lower = x_L, upper = x_U,
-                           X        = X, 
-                           A        = A,
-                           price    = price,
-                           share    = share,
-                           v        = v,
-                           nn       = nn,
-                           Z        = Z,
-                           sharesum = sharesum,
-                           W        = W,
-                           prods    = prods,
-                           IDmkt    = IDmkt,
-                           IDprod   = IDprod)
+#res              <- nlminb(x0, Obj_function, gr = attr(Obj_function, "gradient"), lower = x_L, upper = x_U,
+#                           X        = X, 
+#                           A        = A,
+#                           price    = price,
+#                           share    = share,
+#                           v        = v,
+#                           nn       = nn,
+#                           Z        = Z,
+#                           sharesum = sharesum,
+#                           W        = W,
+#                           prods    = prods,
+#                           IDmkt    = IDmkt,
+#                           IDprod   = IDprod)
 
-toc()
+#toc()
 
 
 

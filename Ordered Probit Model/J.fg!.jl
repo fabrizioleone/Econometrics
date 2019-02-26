@@ -1,5 +1,5 @@
 
-function fg!(F, G, x::Array{Float64,2})
+function fg!(F, G, x)
     thresholds  = [-Inf x[3] x[4] Inf];
     Xb          = W[:,1].*x[1] + W[:,2].*x[2];
     p           = cdf.(Normal(0,1),thresholds[y.+1] - Xb) - cdf.(Normal(0,1),thresholds[y] - Xb);
