@@ -1,5 +1,5 @@
 # Econometrics
-The following repository provides econometrics codes in R, Julia, Matlab and Python. 
+The following repository provides a miscellaneous econometrics codes in R, Julia, Matlab and Python written by me.
 
 
 | Folder        | Object          
