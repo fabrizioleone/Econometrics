@@ -1,12 +1,16 @@
 # ------------- Initialization ------------- #
 
+# Monte Carlo Simulation for control function approach with high dimensiona fixed effects
+# Fabrizio Leone - 2020
+# fabrizioeone93@gmail.com
+
 # Session info
 #install.packages("devtools")
 #devtools::session_info()
 
 # Call packages
 rm(list = ls(all=TRUE))
-Packages  <- c("data.table", "fixest")
+Packages  <- c("data.table", "fixest", "tictoc")
 #invisible(lapply(Packages, install.packages))                      # Uncomment to install packages
 invisible(lapply(Packages, library, character.only = TRUE))
 set.seed(12784)
