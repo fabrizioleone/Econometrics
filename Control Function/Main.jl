@@ -17,7 +17,6 @@ rng = MersenneTwister(1320)
 
 # Define structure with paramaters
 struct Params
-    gamma0::Float64
     gamma1::Float64
     beta1::Float64
 end
@@ -59,26 +58,25 @@ function MonteCarlo(par,ctr)
     df[!, :CF] = StatsBase.residuals(reg(df, @formula(X ~ Z + fe(ID) + fe(Time)), save = true))
     out2 = reg(df, @formula(y ~ X + CF + fe(ID) + fe(Time))).coef[1]
 
-    return [out1 out2]
+    return out2
 end
 
 # Initialize function to run the simulation
 function MC_execute(par,ctr)
-    out = zeros(ctr.Boot,2)
+    out = zeros(ctr.Boot,1)
         @threads for i = 1:ctr.Boot
-                    out[i,:] = MonteCarlo(par,ctr)
+                    out[i] = MonteCarlo(par,ctr)
                  end
 
     return out
 end
 
 #Run simulation
-par = Params(0.5, 1.0, 2.0)
+par = Params(0.5, 2.0)
 ctr = Ctr(100, 5, 1.5, 1000)
 @time MCout = MC_execute(par,ctr)
-@show mean(MCout,dims=1) std(MCout,dims=1)
+@show mean(MCout) std(MCout)
 
 # Plot results
-h1 = histogram(MCout[:,1])
-h2 = histogram(MCout[:,2])
-plot(h1,h2,layout=(1,2),legend=false)
+h1 = histogram(MCout)
+plot(h1,legend=false)
