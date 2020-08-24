@@ -78,7 +78,7 @@ function MC_execute(par,ctr)
             try
                 out[i,:] = MonteCarlo(par,ctr)
             catch
-                skip     # Skip if nlreg fails to converge (this may happen if using another starting value than 0.8)
+                skip     # Skip if nlreg fails to converge 
             end
         end
 
