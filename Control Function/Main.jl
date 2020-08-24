@@ -17,7 +17,6 @@ rng = MersenneTwister(1320)
 
 # Define structure with paramaters
 struct Params
-    gamma0::Float64
     gamma1::Float64
     beta1::Float64
 end
@@ -73,7 +72,7 @@ function MC_execute(par,ctr)
 end
 
 #Run simulation
-par = Params(0.5, 1.0, 2.0)
+par = Params(1.0, 2.0)
 ctr = Ctr(100, 5, 1.5, 1000)
 @time MCout = MC_execute(par,ctr)
 @show mean(MCout,dims=1) std(MCout,dims=1)
