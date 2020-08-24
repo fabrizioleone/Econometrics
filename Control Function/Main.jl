@@ -6,11 +6,14 @@
 #Pkg.add("DataFrames")
 #Pkg.add("CSV")
 #Pkg.add("FixedEffectModels")
+#Pkg.add("GLFixedEffectModels")
+#Pkg.add("GLM")
 #Pkg.add("Random")
 #Pkg.add("Distributions")
 #Pkg.add("LinearAlgebra")
 #Pkg.add("Distributed")
 #Pkg.add("Plots")
+
 using CSV, DataFrames, GLM, GLFixedEffectModels, FixedEffectModels, Random, LinearAlgebra, Distributions, Distributed, Base.Threads, Plots
 Random.seed!(1320);
 rng = MersenneTwister(1320)
@@ -39,7 +42,7 @@ function Create_data(par,ctr)
     X    = aID .+ par.gamma1*Z .+ v                                                  # endogenous regressor
     y    = aID .+ X * par.beta1  .+ u                                                # outcome linear
     y1   = ones(ctr.T*ctr.N,1) .* NaN                                                # initialize outcome Poisson
-    lbd  = exp.(aID  .+ X * par.beta1)                                               # mean Poisson
+    lbd  = exp.(aID  .+ X * par.beta1 .+ u)                                          # mean Poisson
     for j = 1:ctr.T*ctr.N 
         y1[j] = rand(Poisson(lbd[j]))                                                # fill outcome Poisson
     end                         
@@ -52,28 +55,30 @@ end
 
 # Create function to run Monte Carlo Simulation
 function MonteCarlo(par,ctr)
+
     # Crate data
     df = Create_data(par,ctr)
 
-    # 1.Endogenous Regression
-    out1 = reg(df, @formula(y ~ X + FixedEffectModels.fe(ID))).coef[1]
+    # 1.Endogenous Regression 
+    out1 = reg(df, @formula(y ~ X + FixedEffectModels.fe(ID))).coef[1]                                                       # Linear regression
+    out2 = nlreg(df, @formula(y1 ~ X + GLFixedEffectModels.fe(ID)), Poisson(), LogLink(), start = [0.8]).coef[1]             # Poisson regression
 
     # 2. Control Function Approach
     df[!, :CF] = reg(df, @formula(X ~ Z + FixedEffectModels.fe(ID)), save = true).residuals
-    out2 = reg(df, @formula(y ~ X + CF + FixedEffectModels.fe(ID))).coef[1]                                        # Linear regression
-    out3 = nlreg(df, @formula(y1 ~ X + GLFixedEffectModels.fe(ID)), Poisson(), LogLink(), start = [0.8]).coef[1]   # Poisson regression
+    out3 = reg(df, @formula(y ~ X + CF + FixedEffectModels.fe(ID))).coef[1]                                                  # Linear regression
+    out4 = nlreg(df, @formula(y1 ~ X + CF + GLFixedEffectModels.fe(ID)), Poisson(), LogLink(), start = [0.8, 0.1]).coef[1]   # Poisson regression
 
-    return [out1 out2 out3]
+    return [out1 out2 out3 out4]
 end
 
 # Initialize function to run the simulation
 function MC_execute(par,ctr)
-    out = zeros(ctr.Boot,3)
+    out = ones(ctr.Boot,4) .* NaN
         @threads for i = 1:ctr.Boot
             try
                 out[i,:] = MonteCarlo(par,ctr)
             catch
-                skip                      # Skip if nlreg fails to converge (this may happen if using another starting value than 0.8)
+                skip     # Skip if nlreg fails to converge (this may happen if using another starting value than 0.8)
             end
         end
 
@@ -84,11 +89,21 @@ end
 par = Params(0.5, 1.0);
 ctr = Ctr(100, 5, 1.5, 1000);
 @time MCout = MC_execute(par,ctr)
-@show mean(MCout, dims = 1) std(MCout, dims = 1)
+
+# Tabulate results
+MCout   = DataFrame(MCout)
+MCout   = filter(row -> ! isnan(row.x1), MCout)
+MCout   = convert(Matrix, MCout);
+res_out = DataFrame([mean(MCout, dims = 1); std(MCout, dims = 1)]);
+colnames = ["mean - OLS","mean - PPML", "mean - OLS CF", "mean - PPML CF"];
+rename!(res_out, colnames);
+res_out
+println("True mean is: ", par.beta1)
 
 # Plot results
 h1 = histogram(MCout[:,1]);
 h2 = histogram(MCout[:,2]);
 h3 = histogram(MCout[:,3]);
-plot(h1,h2,h3, layout=(1,3), legend=false)
+h4 = histogram(MCout[:,4]);
+plot(h1,h2,h3,h4, layout=(2,2), legend=true)
 
