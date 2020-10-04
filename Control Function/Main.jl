@@ -3,17 +3,7 @@
 # fabrizioeone93@gmail.com
 
 # ------------------------------ Initialization ------------------------------ #
-#Pkg.add("DataFrames")
-#Pkg.add("CSV")
-#Pkg.add("FixedEffectModels")
-#Pkg.add("GLFixedEffectModels")
-#Pkg.add("GLM")
-#Pkg.add("Random")
-#Pkg.add("Distributions")
-#Pkg.add("LinearAlgebra")
-#Pkg.add("Distributed")
-#Pkg.add("Plots")
-
+#Pkg.add.(["DataFrames", "CSV", "FixedEffectModels", "GLFixedEffectModels", "GLM", "Random", "Distributions", "LinearAlgebra", "Distributed", "Plots"])
 using CSV, DataFrames, GLM, GLFixedEffectModels, FixedEffectModels, Random, LinearAlgebra, Distributions, Distributed, Base.Threads, Plots
 Random.seed!(1320);
 rng = MersenneTwister(1320)
@@ -43,9 +33,9 @@ function Create_data(par,ctr)
     y    = aID .+ X * par.beta1  .+ u                                                # outcome linear
     y1   = ones(ctr.T*ctr.N,1) .* NaN                                                # initialize outcome Poisson
     lbd  = exp.(aID  .+ X * par.beta1 .+ u)                                          # mean Poisson
-    for j = 1:ctr.T*ctr.N 
+    for j = 1:ctr.T*ctr.N
         y1[j] = rand(Poisson(lbd[j]))                                                # fill outcome Poisson
-    end                         
+    end
     df   = DataFrame([ID Time y y1 X Z])
     colnames = ["ID","Time","y", "y1", "X","Z"]
     rename!(df, colnames)
@@ -59,7 +49,7 @@ function MonteCarlo(par,ctr)
     # Crate data
     df = Create_data(par,ctr)
 
-    # 1.Endogenous Regression 
+    # 1.Endogenous Regression
     out1 = reg(df, @formula(y ~ X + FixedEffectModels.fe(ID))).coef[1]                                                       # Linear regression
     out2 = nlreg(df, @formula(y1 ~ X + GLFixedEffectModels.fe(ID)), Poisson(), LogLink(), start = [0.8]).coef[1]             # Poisson regression
 
@@ -78,7 +68,7 @@ function MC_execute(par,ctr)
             try
                 out[i,:] = MonteCarlo(par,ctr)
             catch
-                skip     # Skip if nlreg fails to converge 
+                skip     # Skip if nlreg fails to converge
             end
         end
 
@@ -97,7 +87,7 @@ MCout   = convert(Matrix, MCout);
 res_out = DataFrame([mean(MCout, dims = 1); std(MCout, dims = 1)]);
 colnames = ["mean - OLS","mean - PPML", "mean - OLS CF", "mean - PPML CF"];
 rename!(res_out, colnames);
-res_out
+@show res_out
 println("True mean is: ", par.beta1)
 
 # Plot results
@@ -106,4 +96,3 @@ h2 = histogram(MCout[:,2]);
 h3 = histogram(MCout[:,3]);
 h4 = histogram(MCout[:,4]);
 plot(h1,h2,h3,h4, layout=(2,2), legend=true)
-
